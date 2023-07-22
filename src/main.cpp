@@ -110,11 +110,9 @@ public:
     std::shared_ptr<Card> draw_card() const {
         while(true){
             int card_index = rand() % 52;
-            auto card = cards[card_index];
-
-            bool card_in_play = !card.unique();
-            if (card_in_play) {
-                return card;
+            bool card_not_in_play = cards[card_index].unique();
+            if (card_not_in_play) {
+                return cards[card_index];
             }
         }
     }
@@ -127,6 +125,8 @@ int main(){
 
     Deck d;
 
+    // card names are wrong and deck does not work as intended
+    // (it should hang)
     std::cout << d.draw_card()->as_string() << std::endl;
 
     //Card c(1, DIAMONDS);
