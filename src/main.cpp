@@ -204,7 +204,9 @@ int main(){
     // init stuff for game
     Deck d;
     // https://www.reddit.com/r/cpp_questions/comments/swb3et/cant_create_a_vector_of_semaphores_emplacing_back/
-    // is why this is unique ptrs
+    // and
+    // https://stackoverflow.com/questions/27470827/why-does-stdvectorreserve-call-the-copy-constructor
+    // is why this is unique ptr
     // player needs to exist on heap and not move or be copied
     // it cannot be emplaced in the vector or pushed to the back
     std::vector<std::unique_ptr<Player>> players;
@@ -220,11 +222,16 @@ int main(){
         std::string username = input("or enter 's' to start the game" );
 
         if (username == "s") {
+            if(players.size() == 0) {
+                std::cout << "cannot start game with 0 players!" << std::endl;
+                continue;
+            }
+
             std::cout << "starting the game!" << std::endl;
             break;
         }
 
-        // add player
+        // add player | haha implicit conversion
         players.push_back( std::make_unique<Player>(username) );
     }
 
