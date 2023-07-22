@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <string>
 
 enum Suit {
@@ -87,11 +89,46 @@ public:
     }
 };
 
-class Deck {};
+class Deck {
+private:
+    std::shared_ptr<Card> cards[52];
+public:
+    Deck(){
+        const int NUMBER_OF_SUITS = 4;
+        const int NUMBER_OF_CARDS = 13;
+        for (int i = 0; i < NUMBER_OF_SUITS; i++) {
+            for (int j = 0; j < NUMBER_OF_CARDS; j++) {
+                int index = j + (NUMBER_OF_CARDS*i); // 0, 1, 2, 3, ..., 51
+                cards[index] = std::make_shared<Card>(j, (Suit)i);
+            }
+        }
+    }
+
+    // this will hang forever if all cards are "dealt"
+    // that is if the their is more than one shared_ptr 
+    // for every card
+    std::shared_ptr<Card> draw_card() const {
+        while(true){
+            int card_index = rand() % 52;
+            auto card = cards[card_index];
+
+            bool card_in_play = !card.unique();
+            if (card_in_play) {
+                return card;
+            }
+        }
+    }
+};
+
 class Player {};
 
 int main(){
-    Card c(1, DIAMONDS);
+    srand((unsigned) time(NULL));
 
-    std::cout << c.as_string() << std::endl;
+    Deck d;
+
+    std::cout << d.draw_card()->as_string() << std::endl;
+
+    //Card c(1, DIAMONDS);
+    //std::cout << c.as_string() << std::endl;
 }
