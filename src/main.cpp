@@ -206,6 +206,7 @@ int main(){
     // https://www.reddit.com/r/cpp_questions/comments/swb3et/cant_create_a_vector_of_semaphores_emplacing_back/
     // is why this is unique ptrs
     // player needs to exist on heap and not move or be copied
+    // it cannot be emplaced in the vector or pushed to the back
     std::vector<std::unique_ptr<Player>> players;
     Player dealer("dealer");
 
@@ -247,6 +248,8 @@ int main(){
             //const Player& current_player = players[i];
             // TODO
         }
+
+        // TODO handle winning and losing
         
         // post game
         dealer.clear_hand();
