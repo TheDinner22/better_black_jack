@@ -122,6 +122,7 @@ public:
     // this will hang forever if all cards are "dealt"
     // that is if the their is more than one shared_ptr 
     // for every card
+    // TODO should this not be const?
     std::shared_ptr<Card> draw_card() const {
         while(true){
             int card_index = rand() % 52;
@@ -197,6 +198,35 @@ public:
     }
 };
 
+void create_players(std::vector<std::unique_ptr<Player>>& players) {
+    while (true){
+        if (players.size() > 6) {
+            std::cout << "max player count reached!\nStarting Game!" << std::endl;
+            break;
+        }
+
+        std::cout << "enter a players name to add them to the game!" << std::endl;
+        std::string username = input("or enter 's' to start the game" );
+
+        if (username.empty()) {
+            std::cout << "you gotta actually enter a name bruh" << std::endl;
+            continue;
+        }
+        else if (username == "s") {
+            if(players.size() == 0) {
+                std::cout << "cannot start game with 0 players!" << std::endl;
+                continue;
+            }
+
+            std::cout << "starting the game!" << std::endl;
+            break;
+        }
+
+        // add player | haha implicit conversion
+        players.push_back( std::make_unique<Player>(username) );
+    }
+}
+
 int main(){
     // seed rng
     srand((unsigned) time(NULL));
@@ -212,28 +242,8 @@ int main(){
     std::vector<std::unique_ptr<Player>> players;
     Player dealer("dealer");
 
-    // get players
-    while (true){
-        if (players.size() > 6) {
-            std::cout << "max player count reached!\nStarting Game!" << std::endl;
-        }
-
-        std::cout << "enter a players name to add them to the game!" << std::endl;
-        std::string username = input("or enter 's' to start the game" );
-
-        if (username == "s") {
-            if(players.size() == 0) {
-                std::cout << "cannot start game with 0 players!" << std::endl;
-                continue;
-            }
-
-            std::cout << "starting the game!" << std::endl;
-            break;
-        }
-
-        // add player | haha implicit conversion
-        players.push_back( std::make_unique<Player>(username) );
-    }
+    // this fills the players vec with players
+    create_players(players);
 
     while(true) {
         std::cout << "------------" << std::endl;
@@ -253,7 +263,6 @@ int main(){
         // player turns
         for (int i = 0; i < players.size(); i++) {
             //const Player& current_player = players[i];
-            // TODO
         }
 
         // TODO handle winning and losing
