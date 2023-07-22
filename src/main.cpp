@@ -3,6 +3,15 @@
 #include <string>
 #include <vector>
 
+std::string input(const char* prompt){
+    std::cout << prompt << std::endl;
+
+    std::string buffer;
+    std::getline(std::cin, buffer); //WARN idk this function
+    
+    return buffer;
+}
+
 enum Suit {
     DIAMONDS, HEARTS, SPADES, CLUBS
 };
@@ -164,23 +173,85 @@ public:
         return total;
     }
 
+    bool is_bust() const {
+        if (total_points() > 21) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     void clear_hand() {
         cards.clear();
     }
 
-    void draw_card(const Deck& d) {
-        cards.push_back(d.draw_card());
+    void draw_card(const Deck& d, bool verbose=false) {
+        std::shared_ptr<Card> card = d.draw_card();
+
+        if (verbose){
+            std::cout << name << " drew a " << card->as_string() << "!" << std::endl;
+        }
+
+        cards.push_back(card);
     }
 };
 
 int main(){
+    // seed rng
     srand((unsigned) time(NULL));
 
+    // init stuff for game
     Deck d;
+    // https://www.reddit.com/r/cpp_questions/comments/swb3et/cant_create_a_vector_of_semaphores_emplacing_back/
+    // is why this is unique ptrs
+    // player needs to exist on heap and not move or be copied
+    std::vector<std::unique_ptr<Player>> players;
+    Player dealer("dealer");
 
-    std::shared_ptr<Card> c0 = d.draw_card();
-    std::cout << c0->as_string() << std::endl;
+    // get players
+    while (true){
+        if (players.size() > 6) {
+            std::cout << "max player count reached!\nStarting Game!" << std::endl;
+        }
 
-    //Card c(1, DIAMONDS);
-    //std::cout << c.as_string() << std::endl;
+        std::cout << "enter a players name to add them to the game!" << std::endl;
+        std::string username = input("or enter 's' to start the game" );
+
+        if (username == "s") {
+            std::cout << "starting the game!" << std::endl;
+            break;
+        }
+
+        // add player
+        players.push_back( std::make_unique<Player>(username) );
+    }
+
+    while(true) {
+        std::cout << "------------" << std::endl;
+        std::cout << "start new game" << std::endl;
+        std::cout << "------------" << std::endl;
+
+        // draw dealer 2 cards and announce one of them
+        dealer.draw_card(d, true);
+        dealer.draw_card(d);
+
+        // draw players cards
+        for (int i = 0; i < players.size(); i++) {
+            players[i]->draw_card(d);
+            players[i]->draw_card(d);
+        }
+
+        // player turns
+        for (int i = 0; i < players.size(); i++) {
+            //const Player& current_player = players[i];
+            // TODO
+        }
+        
+        // post game
+        dealer.clear_hand();
+        for (int i = 0; i < players.size(); i++) {
+            players[i]->clear_hand();
+        }
+    }
 }
