@@ -160,7 +160,7 @@ public:
             std::shared_ptr<Card> card = cards[i];
             std::cout << card->as_string() << std::endl;
         }
-        std::cout << std::endl;
+        std::cout << std::endl << "which totals " << total_points() << " points." << std::endl;
     }
 
     int total_points() const {
@@ -262,7 +262,10 @@ int main(){
 
         // player turns
         for (int i = 0; i < players.size(); i++) {
-            //const Player& current_player = players[i];
+            players[i]->print_hand();
+
+            // TODO do i need another loop here??????????!!!!!!!!!!!
+            std::string choice = input("hit or stand (h/s)?");
         }
 
         // TODO handle winning and losing
