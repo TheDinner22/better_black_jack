@@ -136,17 +136,17 @@ public:
 
 class Player {
 private:
-    int money;
     std::string name;
     std::vector<std::shared_ptr<Card>> cards;
 public:
+    int money;
+
     // copy breaks the Player i think
     Player(const Player& other) = delete;
     Player& operator=(const Player& other) = delete;
 
     Player(std::string name) : money(100), name(name) {}
 
-    int get_money() const { return money;}
     const std::string& get_name () const {return name;}
 
     void print_hand() const {
@@ -248,7 +248,7 @@ int main(){
     while(true) {
         std::cout << "------------" << std::endl;
         std::cout << "start new game" << std::endl;
-        std::cout << "------------" << std::endl;
+        std::cout << "------------" << std::endl << std::endl;
 
         // draw dealer 2 cards and announce one of them
         dealer.draw_card(d, true);
@@ -264,11 +264,55 @@ int main(){
         for (int i = 0; i < players.size(); i++) {
             players[i]->print_hand();
 
-            // TODO do i need another loop here??????????!!!!!!!!!!!
-            std::string choice = input("hit or stand (h/s)?");
+            while(true) {
+                if(players[i]->is_bust()) {
+                    std::cout << "you are bust!" << std::endl;
+                    break;
+                }
+
+                std::string choice = input("hit or stand (h/s)?");
+
+                if(choice == "s") {break;}
+                else if (choice == "h") {
+                    // draw card
+                    players[i]->draw_card(d, true);
+                    std::cout << players[i]->get_name() << " now has " << players[i]->total_points() << " total points!" << std::endl;
+                    std::cout << "--------------" << std::endl;
+                }
+            }
         }
 
-        // TODO handle winning and losing
+        // dealers turn (dealer hits on 16 or lower)
+        while (true) {
+            dealer.print_hand();
+
+            if (dealer.total_points() > 16) {
+                std::cout << "end dealers turn" << std::endl;
+                break;
+            }
+
+            dealer.draw_card(d, true);
+        }
+
+        std::cout << "dealer ended their turn with " << dealer.total_points() << " points" << std::endl;
+
+        // handle winning and losing
+        // players that win get +1 point
+        // while losers get -1 point
+        for (int i = 0; i < players.size(); i++) {
+            if(players[i]->is_bust()) {
+                players[i]->money -= 1;
+            }
+            else if(dealer.is_bust()) {
+                players[i]->money += 1;
+            }
+            else if (players[i]->total_points() > dealer.total_points()) {
+                players[i]->money += 1;
+            }
+            else {
+                players[i]->money -= 1;
+            }
+        }
         
         // post game
         dealer.clear_hand();
